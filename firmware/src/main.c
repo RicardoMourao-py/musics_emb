@@ -281,6 +281,12 @@ int harry_potter_melody[] = {
 #define LED_START_PIO_IDX       30                  
 #define LED_START_PIO_IDX_MASK  (1 << LED_START_PIO_IDX)
 
+// Progress bar
+#define comprimento_barra 80
+#define largura_barra 4
+#define x_barra 29
+#define y_barra 22
+
 /************************************************************************/
 /* flags                                                                */
 /************************************************************************/
@@ -301,6 +307,7 @@ int i = 0;
 typedef struct {
 	int tempo;
 	int *melody;
+	int notes;
 } song;
 /************************************************************************/
 /* handler / callbacks                                                  */
@@ -376,31 +383,40 @@ void change_song() {
 	}
 }
 
-void create_struct (song *musica, int tempo, int *melody) {
+void create_struct (song *musica, int tempo, int *melody, int notes) {
 	musica -> tempo = tempo;
 	musica -> melody = &melody[0];
+	musica -> notes = notes;
 }
 
-void play_song(song *musica) {
-	int notes = sizeof((*musica).melody) / sizeof((*musica).melody[0]) / 2; // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
+void play_song(song musica) {
+	
+	//int notes = sizeof(mario_melody) / sizeof(mario_melody[0]) / 2; // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 	// there are two values per note (pitch and duration), so for each note there are four bytes
-	int wholenote = (60000 * 4) / (*musica).tempo; // this calculates the duration of a whole note in ms
+	int wholenote = (60000 * 4) / musica.tempo; // this calculates the duration of a whole note in ms
 	int divider = 0, noteDuration = 0;
 	
-	for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+	int passos = musica.notes;
+	int largura_pixel = comprimento_barra/passos;
+	int cont  = 1;
+	
+	for (int thisNote = 0; thisNote < musica.notes * 2; thisNote = thisNote + 2) {
 		if (!flag_pause) {
 			// calculates the duration of each note
-			divider = (*musica).melody[thisNote + 1];
+			divider = musica.melody[thisNote + 1];
 			noteDuration = (wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
 			}
 			
 			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone((*musica).melody[thisNote], noteDuration);
+			tone(musica.melody[thisNote], noteDuration);
 			
 			// Wait for the specief duration before playing the next note.
 			delay_us(noteDuration);
+			
+			gfx_mono_draw_rect(x_barra+1, y_barra+1, ((double)comprimento_barra/musica.notes*cont)+1, 2, GFX_PIXEL_SET);
+			cont++;
 			
 			} else {
 			thisNote = thisNote - 2;
@@ -491,14 +507,13 @@ int main (void)
 	song star_wars;
 	song harry_potter;
 	
-	create_struct(&mario, tempo_mario, mario_melody);
-	create_struct(&star_wars, tempo_star_wars, star_wars_melody);
-	create_struct(&harry_potter, tempo_harry_potter, harry_potter_melody);
+	create_struct(&mario, tempo_mario, mario_melody, sizeof(mario_melody) / sizeof(mario_melody[0]) / 2);
+	create_struct(&star_wars, tempo_star_wars, star_wars_melody, sizeof(star_wars_melody) / sizeof(star_wars_melody[0]) / 2);
+	create_struct(&harry_potter, tempo_harry_potter, harry_potter_melody, sizeof(harry_potter_melody) / sizeof(harry_potter_melody[0]) / 2);
 	
-	song *songs[3] = {&mario, &star_wars, &harry_potter};
+	song songs[3] = {mario, star_wars, harry_potter};
 	
 	write_song(i);
-	
 	while(1) {
 		if (flag_change) {
 			change_song();
@@ -508,6 +523,7 @@ int main (void)
 		
 		if (flag_play) {
 			play_song(songs[i]);
+			gfx_mono_draw_rect(x_barra+1, y_barra+1, 80, 2, GFX_PIXEL_CLR);
 			flag_play = 0;		
 		}
 	}
