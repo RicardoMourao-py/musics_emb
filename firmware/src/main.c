@@ -247,7 +247,6 @@ int harry_potter_melody[] = {
 	NOTE_G4, -1,
 	
 };
-	
 /************************************************************************/
 /* Defines                                                              */
 /************************************************************************/
@@ -391,7 +390,6 @@ void create_struct (song *musica, int tempo, int *melody, int notes) {
 
 void play_song(song musica) {
 	
-	//int notes = sizeof(mario_melody) / sizeof(mario_melody[0]) / 2; // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 	// there are two values per note (pitch and duration), so for each note there are four bytes
 	int wholenote = (60000 * 4) / musica.tempo; // this calculates the duration of a whole note in ms
 	int divider = 0, noteDuration = 0;
@@ -520,7 +518,6 @@ int main (void)
 			write_song(i);
 			flag_change = 0;
 		}
-		
 		if (flag_play) {
 			play_song(songs[i]);
 			gfx_mono_draw_rect(x_barra+2, y_barra+1, 80, 2, GFX_PIXEL_CLR);
