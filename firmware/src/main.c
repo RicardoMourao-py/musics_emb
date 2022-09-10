@@ -184,7 +184,7 @@ int mario_melody[] = {
 	NOTE_G4,8, NOTE_D4,8, NOTE_E4,-2,
 };
 
-int melody[] = {
+int star_wars_melody[] = {
 	  // Cantina BAnd - Star wars
 	  // Score available at https://musescore.com/user/6795541/scores/1606876
 	  NOTE_B4,-4, NOTE_E5,-4, NOTE_B4,-4, NOTE_E5,-4,
@@ -247,7 +247,7 @@ int harry_potter_melody[] = {
 	NOTE_G4, -1,
 	
 };
-
+	
 /************************************************************************/
 /* Defines                                                              */
 /************************************************************************/
@@ -287,14 +287,21 @@ int harry_potter_melody[] = {
 volatile char flag_play = 0;
 volatile char flag_pause = 0;
 volatile char flag_change = 0;
-
 /************************************************************************/
 /* variaveis globais                                                    */
 /************************************************************************/
-int tempo_mario = 200;
-int tempo = 140;
-int tempo_harry_potter = 144;
+#define tempo_mario 200
+#define tempo_star_wars 140
+#define tempo_harry_potter 144
 
+int i = 0;
+/************************************************************************/
+/* structs                                                              */
+/************************************************************************/
+typedef struct {
+	int tempo;
+	int *melody;
+} song;
 /************************************************************************/
 /* handler / callbacks                                                  */
 /************************************************************************/
@@ -309,10 +316,7 @@ void pause_callback(void) {
 
 
 void selecao_callback(void) {
-	flag_change += 1;
-	if (flag_change > 2) {
-		flag_change = 0;
-	}
+	flag_change = 1;
 }
 
 /************************************************************************/
@@ -342,17 +346,17 @@ void buzzer_test(int freq) {
 	delay_us(t/2);
 }
 
-void write_song(volatile char i) {
+void write_song(int i) {
 	if (i == 0) {
-		gfx_mono_draw_string("           ", 30,5, &sysfont);
-		gfx_mono_draw_string("Mario", 30,5, &sysfont);
+		gfx_mono_draw_string("                   ", 10,2, &sysfont);
+		gfx_mono_draw_string("mario", 10,2, &sysfont);
 	}
 	else if (i == 1) {
-		gfx_mono_draw_string("           ", 30,5, &sysfont);
-		gfx_mono_draw_string("Star Wars", 30,5, &sysfont);
+		gfx_mono_draw_string("                   ", 10,2, &sysfont);
+		gfx_mono_draw_string("star wars", 10,2, &sysfont);
 	} else {
-		gfx_mono_draw_string("           ", 30,5, &sysfont);         
-		gfx_mono_draw_string("Harry Potter", 30,5, &sysfont);
+		gfx_mono_draw_string("                   ", 10,2, &sysfont);         
+		gfx_mono_draw_string("harry potter", 10,2, &sysfont);
 	}
 }
 
@@ -365,31 +369,42 @@ void tone(int freq, int time){
 	pio_set(LED_START_PIO, LED_START_PIO_IDX_MASK);   // 1
 }
 
-void play_song() {	
-	int notes = sizeof(melody) / sizeof(melody[0]) / 2; // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
+void change_song() {
+	i += 1;
+	if (i > 2) {
+		i = 0;
+	}
+}
+
+void create_struct (song *musica, int tempo, int *melody) {
+	musica -> tempo = tempo;
+	musica -> melody = &melody[0];
+}
+
+void play_song(song *musica) {
+	int notes = sizeof((*musica).melody) / sizeof((*musica).melody[0]) / 2; // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 	// there are two values per note (pitch and duration), so for each note there are four bytes
-	int wholenote = (60000 * 4) / tempo; // this calculates the duration of a whole note in ms
+	int wholenote = (60000 * 4) / (*musica).tempo; // this calculates the duration of a whole note in ms
 	int divider = 0, noteDuration = 0;
 	
 	for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
 		if (!flag_pause) {
 			// calculates the duration of each note
-			divider = melody[thisNote + 1];
+			divider = (*musica).melody[thisNote + 1];
 			noteDuration = (wholenote) / abs(divider);
 			if (divider < 0) {
 				noteDuration *= 1.5; // increases the duration in half for dotted notes
 			}
 			
 			// we only play the note for 90% of the duration, leaving 10% as a pause
-			tone(melody[thisNote], noteDuration);
+			tone((*musica).melody[thisNote], noteDuration);
 			
 			// Wait for the specief duration before playing the next note.
 			delay_us(noteDuration);
 			
-		} else {
+			} else {
 			thisNote = thisNote - 2;
 		}
-		
 	}
 }
 
@@ -408,7 +423,6 @@ void init(void){
 	pmc_enable_periph_clk(BUZZER_PIO_ID);
 	pio_set_output(BUZZER_PIO, BUZZER_PIO_IDX_MASK, 0, 0, 0);
 	pio_pull_up(BUZZER_PIO, BUZZER_PIO_IDX_MASK, 1);
-	
 	
 	pmc_enable_periph_clk(START_PIO_ID);
 	pmc_enable_periph_clk(PAUSE_PIO_ID);
@@ -438,7 +452,7 @@ void init(void){
 	pio_handler_set(SELECAO_PIO,
 					SELECAO_PIO_ID,
 					SELECAO_PIO_IDX_MASK,
-					PIO_IT_EDGE,
+					PIO_IT_FALL_EDGE,
 					selecao_callback);
 					
 	pio_enable_interrupt(START_PIO, START_PIO_IDX_MASK);
@@ -470,17 +484,30 @@ int main (void)
 
     // Init OLED
 	gfx_mono_ssd1306_init();
-  
-    // Escreve na tela um circulo e um texto
-    
-	
+   
 	init();
 	
-  /* Insert application code here, after the board has been initialized. */
+	song mario;
+	song star_wars;
+	song harry_potter;
+	
+	create_struct(&mario, tempo_mario, mario_melody);
+	create_struct(&star_wars, tempo_star_wars, star_wars_melody);
+	create_struct(&harry_potter, tempo_harry_potter, harry_potter_melody);
+	
+	song *songs[3] = {&mario, &star_wars, &harry_potter};
+	
+	write_song(i);
+	
 	while(1) {
-		write_song(flag_change);
+		if (flag_change) {
+			change_song();
+			write_song(i);
+			flag_change = 0;
+		}
+		
 		if (flag_play) {
-			play_song();
+			play_song(songs[i]);
 			flag_play = 0;		
 		}
 	}
