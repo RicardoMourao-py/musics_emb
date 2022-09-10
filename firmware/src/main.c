@@ -523,7 +523,7 @@ int main (void)
 		
 		if (flag_play) {
 			play_song(songs[i]);
-			gfx_mono_draw_rect(x_barra+1, y_barra+1, 80, 2, GFX_PIXEL_CLR);
+			gfx_mono_draw_rect(x_barra+2, y_barra+1, 80, 2, GFX_PIXEL_CLR);
 			flag_play = 0;		
 		}
 	}
