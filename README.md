@@ -12,6 +12,10 @@ foi concluído! Isso gerará um PR no classroom que será avaliado pela equipe.
 
 ## Documentação
 
+- [auxiliar.h](firmware/src/auxiliar.h): arquivo responsável pelos defines, structs, flags, variáveis globais, prototypes.
+- [auxiliar.c](firmware/src/auxiliar.c): arquivo responsável pelos handler/callbacks e funções.
+- [main.c](firmware/src/main.c): arquivo para a compilação do código.          
+
 Aqui podemos visualizar qual é a função que cada pino utiliza. Além disso, podemos verificar quais I/O's foram escolhidos.
 
 | Função  | PINO (ex: PA11) |
@@ -28,7 +32,7 @@ Aqui podemos visualizar qual é a função que cada pino utiliza. Além disso, p
 
 ### Vídeo do projeto
 
-TODO: Inserir link para vídeo do projeto funcionando
+https://youtu.be/gFBrGXOrsDk
 
 ### Músicas e Direitos autorais
 
