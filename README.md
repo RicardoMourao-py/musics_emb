@@ -24,7 +24,7 @@ Aqui podemos visualizar qual é a função que cada pino utiliza. Além disso, p
 
 ### Imagem da montagem
 
-TODO: Inserir imagem do sistema montado
+<img src="circuito.jpeg" alt="drawing" width="200"/>
 
 ### Vídeo do projeto
 
