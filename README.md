@@ -12,15 +12,15 @@ foi concluído! Isso gerará um PR no classroom que será avaliado pela equipe.
 
 ## Documentação
 
-TODO: Aualizar pinos
+Aqui podemos visualizar qual é a função que cada pino utiliza. Além disso, podemos verificar quais I/O's foram escolhidos.
 
 | Função  | PINO (ex: PA11) |
 |---------|-----------------|
-| BUZZER  |                 |
-| START   |                 |
-| SELEÇÃO |                 |
-| PAUSE   |                 |
-| LED     |                 |
+| BUZZER  |      PC13       |
+| START   |      PA11       |
+| SELEÇÃO |      PA19       |
+| PAUSE   |      PC31       |
+| LED     |      PC30       |
 
 ### Imagem da montagem
 
