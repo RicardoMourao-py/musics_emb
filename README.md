@@ -19,6 +19,8 @@ TODO: Aualizar pinos
 | BUZZER  |                 |
 | START   |                 |
 | SELEÇÃO |                 |
+| PAUSE   |                 |
+| LED     |                 |
 
 ### Imagem da montagem
 
@@ -30,4 +32,7 @@ TODO: Inserir link para vídeo do projeto funcionando
 
 ### Músicas e Direitos autorais
 
-TODO: Listar músicas e dar crédio da onde saiu:
+Todas as músicas utilizadas seguem listadas:
+- Harry Potter: https://github.com/robsoncouto/arduino-songs/blob/master/harrypotter/harrypotter.ino
+- Star Wars: https://github.com/robsoncouto/arduino-songs/blob/master/cantinaband/cantinaband.ino
+- Mario Bros: https://github.com/robsoncouto/arduino-songs/blob/master/supermariobros/supermariobros.ino
